@@ -2,6 +2,13 @@
 <meta charset="utf-8">
 <html>
 <head>
+
+  <!-- In case someone actually reads this.
+       THIS IS NOT HOW TO DO WEB PROGRAMMING!
+       I just threw this together so my fiance could
+       use the model.
+       It ain't gotta be pretty if it does the job and nobody will see it
+  -->
   <title>L&auml;genhet</title>
   <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
 </head>
@@ -86,6 +93,7 @@
 </div>
 <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
 <script>
+  // Silly function to convert the select to binary values
   var balconyToBalcony = function(balconyText) {
     if (balconyText==="no") {
       return [0,0];
@@ -97,56 +105,51 @@
       return [1,1];
     }
   }
-  var sqm =  function() { return parseInt($("#kvm").val())};
-  var rooms = function() { return parseInt($("#rooms").val()) };
-  var kitchen = function() { return ($("#kitchen").is(":checked")) ? 1 : 0 };
-  var balcony = function() { return balconyToBalcony($("#balcony").val())[1] };
-  var glass = function() { return balconyToBalcony($("#balcony").val())[0] };
-  var sauna = function() { return ($("#sauna").is(":checked")) ? 1 : 0 };
-  var view = function() { return ($("#view").is(":checked")) ? 1 : 0 };
+  // These are functions so they will be computed whenever refrenced, this is intentional
+  var sqm =       function() { return parseInt($("#kvm").val())};
+  var rooms =     function() { return parseInt($("#rooms").val()) };
+  var kitchen =   function() { return ($("#kitchen").is(":checked")) ? 1 : 0 };
+  var balcony =   function() { return balconyToBalcony($("#balcony").val())[1] };
+  var glass =     function() { return balconyToBalcony($("#balcony").val())[0] };
+  var sauna =     function() { return ($("#sauna").is(":checked")) ? 1 : 0 };
+  var view =      function() { return ($("#view").is(":checked")) ? 1 : 0 };
   var renovated = function() { return ($("#renovated").is(":checked")) ? 1 : 0 };
-  var power = function() { return ($("#electricity").is(":checked")) ? 1 : 0 };
-  var water = function() { return ($("#water").is(":checked")) ? 1 : 0 };
-  var car = function() { return ($("#car").is(":checked")) ? 1 : 0 };
-  var wc = function() { return parseInt($("#wc").val()) };
-  var internet = function() { return ($("#internet").is(":checked")) ? 1 : 0 };
+  var power =     function() { return ($("#electricity").is(":checked")) ? 1 : 0 };
+  var water =     function() { return ($("#water").is(":checked")) ? 1 : 0 };
+  var car =       function() { return ($("#car").is(":checked")) ? 1 : 0 };
+  var wc =        function() { return parseInt($("#wc").val()) };
+  var internet =  function() { return ($("#internet").is(":checked")) ? 1 : 0 };
+
+  // The order is just the order they happened to be when I trained the model,
+  // don't think about it
   var x = [rooms, kitchen, sqm, balcony, glass, view, sauna, renovated, internet, water, power, car, wc];
-  console.log(x);
+
+  // This performs prediction using a linear regression model with the slopes
+  // of b and the intercept of ys initial value. Using y=a+bx
   var computePrice = function(x) {
-    var y = 280.7967;
+    var y = 280.7967; // Intercept
+    // slope for the various parameters, computed using octave
     var b = [37.6826,30.4420,3.6985,69.1443,44.6883,80.7767,117.8221,39.1188,83.2247,-37.3175,63.0625,-92.4519,-61.9607];
+    // vector product of b' x, or the pairwise sum if linear algebra isn't yer thing
     for (var i=0;i<b.length;i++) {
       y+=b[i]*x[i]();
     }
     console.log(y)
     return y;
   }
+
+  // convenience function to limit the exposure to dirty dirty jquery selectors
   var renderPrice = function() {
     $("#price").html(computePrice(x))
   }
 
-  renderPrice()
-
+  // we want changes to happen instantly so we do this
   $("input").on("keyup", function () { renderPrice(); });
+  $("input[type=checkbox]").on("change", function () { renderPrice(); });
   $("select").on("change", function () { renderPrice(); });
-  $("#balcony").on("change", function () {
-    balcony = (balcony+1) % 2;
-    renderPrice();
-  });
-  $("#sauna").on("change", function () {
-    sauna = (sauna+1) % 2;
-    renderPrice();
-  });
-  $("#view").on("change", function () {
-    view = (view+1) % 2;
-    renderPrice();
-  });
-  $("#renovated").on("change", function () {
-    renovated = (renovated+1) % 2;
-    renderPrice();
-  });
 
-  console.log($("#kvm"))
+
+  renderPrice(); // let's kick it off
 </script>
 </body>
 </html>
