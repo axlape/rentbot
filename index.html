@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+  <title>L&auml;genhet</title>
+  <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+  <h1>Lägenhetspriser</h1>
+  <div class="row">
+    <div class="col-md-4">
+      <h2>Prisdata</h2>
+      <form role="form">
+        <div class="form-group">
+          <label for="kvm">Antal kvadratmeter</label>
+          <input type="number" class="form-control" id="kvm" value="70">
+        </div>
+        <div class="form-group">
+          <label for="rooms">Antal rum</label>
+          <input type="number" class="form-control" id="rooms" value="2">
+        </div>
+        <div class="form-group">
+          <label for="wc">Antal wc</label>
+          <input type="number" class="form-control" id="wc" value="1">
+        </div>
+        <select class="form-control" name="select" id="balcony">
+          <option value="no">Ingen Balkong</option>
+          <option value="balcony">Balkong</option>
+          <option value="glassed" selected>Inglasad Balkong</option>
+        </select>
+        <div class="checkbox">
+          <label>
+            <input id="kitchen" type="checkbox" checked="checked"> Kök
+          </label>
+        </div>
+
+        <div class="checkbox">
+          <label>
+            <input id="view" type="checkbox"> Havsutsikt
+          </label>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input id="sauna" type="checkbox"> Bastu
+          </label>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input id="renovated" type="checkbox"> Nyrenoverad
+          </label>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input id="internet" type="checkbox"> Internet
+          </label>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input id="water" type="checkbox"> Vatten
+          </label>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input id="electricity" type="checkbox"> El
+          </label>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input id="car" type="checkbox"> Bilplats
+          </label>
+        </div>
+      </form>
+    </div>
+    <div class="col-md-2"></div>
+    <div class="col-md-6">
+    <h2>Resultat</h2>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <span class="badge"><span id="price">14</span> €</span>
+        Pris
+      </li>
+    </ul>
+    </div>
+  </div>
+</div>
+<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+<script>
+  var balconyToBalcony = function(balconyText) {
+    if (balconyText==="no") {
+      return [0,0];
+    }
+    if (balconyText==="balcony") {
+      return [0,1];
+    }
+    if (balconyText==="glassed") {
+      return [1,1];
+    }
+  }
+  var sqm =  function() { return parseInt($("#kvm").val())};
+  var rooms = function() { return parseInt($("#rooms").val()) };
+  var kitchen = function() { return ($("#kitchen").is(":checked")) ? 1 : 0 };
+  var balcony = function() { return balconyToBalcony($("#balcony").val())[1] };
+  var glass = function() { return balconyToBalcony($("#balcony").val())[0] };
+  var sauna = function() { return ($("#sauna").is(":checked")) ? 1 : 0 };
+  var view = function() { return ($("#view").is(":checked")) ? 1 : 0 };
+  var renovated = function() { return ($("#renovated").is(":checked")) ? 1 : 0 };
+  var power = function() { return ($("#electricity").is(":checked")) ? 1 : 0 };
+  var water = function() { return ($("#water").is(":checked")) ? 1 : 0 };
+  var car = function() { return ($("#car").is(":checked")) ? 1 : 0 };
+  var wc = function() { return parseInt($("#wc").val()) };
+  var internet = function() { return ($("#internet").is(":checked")) ? 1 : 0 };
+  var x = [rooms, kitchen, sqm, balcony, glass, view, sauna, renovated, internet, water, power, car, wc];
+  console.log(x);
+  var computePrice = function(x) {
+    var y = 280.7967;
+    var b = [37.6826,30.4420,3.6985,69.1443,44.6883,80.7767,117.8221,39.1188,83.2247,-37.3175,63.0625,-92.4519,-61.9607];
+    for (var i=0;i<b.length;i++) {
+      y+=b[i]*x[i]();
+    }
+    console.log(y)
+    return y;
+  }
+  var renderPrice = function() {
+    $("#price").html(computePrice(x))
+  }
+
+  renderPrice()
+
+  $("input").on("keyup", function () { renderPrice(); });
+  $("select").on("change", function () { renderPrice(); });
+  $("#balcony").on("change", function () {
+    balcony = (balcony+1) % 2;
+    renderPrice();
+  });
+  $("#sauna").on("change", function () {
+    sauna = (sauna+1) % 2;
+    renderPrice();
+  });
+  $("#view").on("change", function () {
+    view = (view+1) % 2;
+    renderPrice();
+  });
+  $("#renovated").on("change", function () {
+    renovated = (renovated+1) % 2;
+    renderPrice();
+  });
+
+  console.log($("#kvm"))
+</script>
+</body>
+</html>
